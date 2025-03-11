@@ -1,26 +1,30 @@
-package modelo;
+package dao;
 
+import modelo.UsuarioSecundario;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductoDAO {
+public class UsuarioSecundarioDAO {
     private static final String URL = "jdbc:mysql://localhost:3306/inventario_pro";
     private static final String USER = "root";
     private static final String PASSWORD = "";
+    private static String contrasena;
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    public static boolean insertarProducto(String nombre, String descripcion, double precio, int cantidad) {
-        String sql = "INSERT INTO productos(nombre, descripcion, precio, cantidad) VALUES (?, ?, ?, ?)";
+    public static boolean insertarUsuarioSecundario(String nombre, String email, String telefono) {
+        String sql = "INSERT INTO usuarios_secundarios (nombre, email, telefono, contrasena, id_administrador) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nombre);
-            stmt.setString(2, descripcion);
-            stmt.setDouble(3, precio);
-            stmt.setInt(4, cantidad);
+            stmt.setString(2, email);
+            stmt.setString(3, telefono);
+            stmt.setString(4, contrasena);
+            int idAdministrador = 0;
+            stmt.setInt(5, idAdministrador);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -28,40 +32,40 @@ public class ProductoDAO {
         }
     }
 
-    public static List<Producto> consultarProductos() {
-        List<Producto> productos = new ArrayList<>();
-        String sql = "SELECT * FROM productos";
+    public static List<UsuarioSecundario> consultarUsuariosSecundarios() {
+        List<UsuarioSecundario> lista = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios_secundarios";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-
             while (rs.next()) {
-                productos.add(new Producto(
+                lista.add(new UsuarioSecundario(
                         rs.getInt("id"),
                         rs.getString("nombre"),
-                        rs.getString("descripcion"),
-                        rs.getDouble("precio"),
-                        rs.getInt("cantidad")
+                        rs.getString("email"),
+                        rs.getString("telefono"),
+                        rs.getString("contrasena"),
+                        rs.getInt("id_administrador")
                 ));
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return productos;
+        return lista;
     }
 
-
-    public static boolean actualizarProducto(int id, String nombre, String descripcion, double precio, int cantidad) {
-        String sql = "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, cantidad = ? WHERE id = ?";
+    public static boolean actualizarUsuarioSecundario(int id, String nombre, String email, String telefono) {
+        String sql = "UPDATE usuarios_secundarios SET nombre = ?, email = ?, telefono = ?, contrasena = ?, id_administrador = ? WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nombre);
-            stmt.setString(2, descripcion);
-            stmt.setDouble(3, precio);
-            stmt.setInt(4, cantidad);
-            stmt.setInt(5, id);
+            stmt.setString(2, email);
+            stmt.setString(3, telefono);
+            stmt.setString(4, contrasena);
+            int idAdministrador = 0;
+            stmt.setInt(5, idAdministrador);
+            stmt.setInt(6, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -69,8 +73,8 @@ public class ProductoDAO {
         }
     }
 
-    public static boolean eliminarProducto(int id) {
-        String sql = "DELETE FROM productos WHERE id = ?";
+    public static boolean eliminarUsuarioSecundario(int id) {
+        String sql = "DELETE FROM usuarios_secundarios WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);

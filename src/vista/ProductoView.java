@@ -1,131 +1,146 @@
 package vista;
 
+import controlador.ProductoController;
+import modelo.Producto;
+import java.util.List;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import controlador.ProductoController;
 
-public class ProductoView extends JFrame {
-    private JTextField txtId, txtNombre, txtDescripcion, txtPrecio, txtCantidad;
+public class ProductoView extends JPanel {
+    private JTextField tfNombre, tfCantidad, tfPrecio, tfCategoria, tfDescripcion, tfId;
     private JButton btnAgregar, btnConsultar, btnActualizar, btnEliminar;
-    private JTextArea textArea;
-    private ProductoController controller;
+    private JTextArea areaConsulta;
 
-    public ProductoView(ProductoController controller) {
-        this.controller = controller;
-        setTitle("Gestión de Productos");
-        setSize(600, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+    public ProductoView() {
+        setLayout(new BorderLayout());
 
-        // Configurar el layout
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JPanel formPanel = new JPanel(new GridLayout(7, 2, 10, 10)); // Se agregó una fila más para ID
 
-        // Crear componentes
-        JLabel lblId = new JLabel("ID:");
-        txtId = new JTextField(10);
-        JLabel lblNombre = new JLabel("Nombre:");
-        txtNombre = new JTextField(20);
-        JLabel lblDescripcion = new JLabel("Descripción:");
-        txtDescripcion = new JTextField(20);
-        JLabel lblPrecio = new JLabel("Precio:");
-        txtPrecio = new JTextField(10);
-        JLabel lblCantidad = new JLabel("Cantidad:");
-        txtCantidad = new JTextField(10);
+        formPanel.add(new JLabel("ID:"));
+        tfId = new JTextField();
+        formPanel.add(tfId);
 
-        btnAgregar = new JButton("Agregar Producto");
-        btnConsultar = new JButton("Consultar Productos");
-        btnActualizar = new JButton("Actualizar Producto");
-        btnEliminar = new JButton("Eliminar Producto");
-        textArea = new JTextArea(10, 40);
-        textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
+        formPanel.add(new JLabel("Nombre del Producto:"));
+        tfNombre = new JTextField();
+        formPanel.add(tfNombre);
 
-        // Agregar componentes a la interfaz
-        gbc.gridx = 0; gbc.gridy = 0;
-        add(lblId, gbc);
-        gbc.gridx = 1;
-        add(txtId, gbc);
+        formPanel.add(new JLabel("Descripción:"));
+        tfDescripcion = new JTextField();
+        formPanel.add(tfDescripcion);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        add(lblNombre, gbc);
-        gbc.gridx = 1;
-        add(txtNombre, gbc);
+        formPanel.add(new JLabel("Cantidad:"));
+        tfCantidad = new JTextField();
+        formPanel.add(tfCantidad);
 
-        gbc.gridx = 0; gbc.gridy = 2;
-        add(lblDescripcion, gbc);
-        gbc.gridx = 1;
-        add(txtDescripcion, gbc);
+        formPanel.add(new JLabel("Precio:"));
+        tfPrecio = new JTextField();
+        formPanel.add(tfPrecio);
 
-        gbc.gridx = 0; gbc.gridy = 3;
-        add(lblPrecio, gbc);
-        gbc.gridx = 1;
-        add(txtPrecio, gbc);
+        formPanel.add(new JLabel("Categoría:"));
+        tfCategoria = new JTextField();
+        formPanel.add(tfCategoria);
 
-        gbc.gridx = 0; gbc.gridy = 4;
-        add(lblCantidad, gbc);
-        gbc.gridx = 1;
-        add(txtCantidad, gbc);
+        JPanel buttonPanel = new JPanel();
+        btnAgregar = new JButton("Insertar");
+        btnConsultar = new JButton("Consultar");
+        btnActualizar = new JButton("Actualizar");
+        btnEliminar = new JButton("Eliminar");
 
-        gbc.gridx = 0; gbc.gridy = 5;
-        add(btnAgregar, gbc);
-        gbc.gridx = 1;
-        add(btnConsultar, gbc);
+        buttonPanel.add(btnAgregar);
+        buttonPanel.add(btnConsultar);
+        buttonPanel.add(btnActualizar);
+        buttonPanel.add(btnEliminar);
 
-        gbc.gridx = 0; gbc.gridy = 6;
-        add(btnActualizar, gbc);
-        gbc.gridx = 1;
-        add(btnEliminar, gbc);
+        areaConsulta = new JTextArea(5, 30);
+        areaConsulta.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(areaConsulta);
 
-        gbc.gridx = 0; gbc.gridy = 7;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.BOTH;
-        add(scrollPane, gbc);
+        add(formPanel, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.CENTER);
+        add(scrollPane, BorderLayout.SOUTH);
+    }
 
-        // Agregar eventos
-        btnAgregar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.agregarProducto(
-                        txtNombre.getText(),
-                        txtDescripcion.getText(),
-                        Double.parseDouble(txtPrecio.getText()),
-                        Integer.parseInt(txtCantidad.getText())
-                );
+    public void addInsertarListener(ActionListener listener) {
+        btnAgregar.addActionListener(listener);
+    }
+
+    public void addConsultarListener(ActionListener listener) {
+        btnConsultar.addActionListener(listener);
+    }
+
+    public void addActualizarListener(ActionListener listener) {
+        btnActualizar.addActionListener(listener);
+    }
+
+    public void addEliminarListener(ActionListener listener) {
+        btnEliminar.addActionListener(listener);
+    }
+
+    public void mostrarConsulta(String resultado) {
+        areaConsulta.setText(resultado);
+    }
+
+    public String getNombre() {
+        return tfNombre.getText();
+    }
+
+    public int getCantidad() {
+        try {
+            return Integer.parseInt(tfCantidad.getText().trim());  // ✅ Conversión a int
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Cantidad debe ser un número entero.");
+            return 0; // Valor por defecto
+        }
+    }
+
+    public double getPrecio() {
+        try {
+            return Double.parseDouble(tfPrecio.getText().trim());  // ✅ Conversión a double
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Precio debe ser un número válido.");
+            return 0.0; // Valor por defecto
+        }
+    }
+
+
+
+    public String getCategoria() {
+        return tfCategoria.getText();
+    }
+
+    public int getIdSeleccionado() {
+        String idText = tfId.getText().trim();
+        if (idText.isEmpty()) {
+            return -1;
+        }
+        try {
+            return Integer.parseInt(idText);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    public String getDescripcion() {
+        return tfDescripcion.getText();
+    }
+
+    public void mostrarProductos(List<Producto> productos) {
+        StringBuilder sb = new StringBuilder();
+
+        if (productos.isEmpty()) {
+            sb.append("No hay productos registrados.\n");
+        } else {
+            for (Producto producto : productos) {
+                sb.append(producto.toString()).append("\n");
             }
-        });
+        }
 
-        btnConsultar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.consultarProductos();
-            }
-        });
+        areaConsulta.setText(sb.toString());
+    }
 
-        btnActualizar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.actualizarProducto(
-                        Integer.parseInt(txtId.getText()),
-                        txtNombre.getText(),
-                        txtDescripcion.getText(),
-                        Double.parseDouble(txtPrecio.getText()),
-                        Integer.parseInt(txtCantidad.getText())
-                );
-            }
-        });
 
-        btnEliminar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.eliminarProducto(Integer.parseInt(txtId.getText()));
-            }
-        });
+    public void setController(ProductoController productoController) {
 
-        setVisible(true);
     }
 }
